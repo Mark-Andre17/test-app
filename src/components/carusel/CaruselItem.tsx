@@ -15,7 +15,9 @@ const CaruselItem:FC<ICaruselItemProps> = ({ src, alt, text, href}) => {
     return (
             <div className="carusel-item">
                 <Image src={src} alt={alt}></Image>
-                <Link href={`/${href}`}>{text}</Link>
+                <Link href={`/${href}`}>
+                    {text}
+                </Link>
             </div>
     );
 };
