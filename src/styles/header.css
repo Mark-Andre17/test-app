@@ -1,0 +1,44 @@
+.header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #E1E1E1;
+}
+.mobile-menu {
+    display: none;
+    width: 60px;
+    height: 28px;
+    background-color: black;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: none;
+}
+.logo {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    text-transform: uppercase;
+}
+.menu {
+    display: flex;
+    gap: 24px;
+}
+.login{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    width: 80px;
+}
+@media screen and (max-width: 640px){
+    .mobile-menu {
+        display: block;
+    }
+    .login, .menu, .logo > p{
+        display: none;
+    }
+}

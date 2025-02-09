@@ -1,0 +1,73 @@
+.slider-container {
+    position: relative;
+    padding: 16px 16px;
+}
+
+.carusel-block {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    cursor: grab;
+    gap: 16px;
+    padding: 16px 0;
+}
+
+.carusel-block::-webkit-scrollbar {
+    display: none;
+}
+
+.main-carusel {
+    display: flex;
+    gap: 16px;
+}
+
+.carusel-item {
+    width: 412px;
+    background-color: #F0F0F0;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    gap: 56px;
+    font-size: 26px;
+    transition: box-shadow 0.3s;
+}
+
+.carusel-item:hover {
+    -webkit-box-shadow: 4px 17px 8px 0px rgba(197, 197, 197, 0.2);
+    -moz-box-shadow: 4px 17px 8px 0px rgba(197, 197, 197, 0.2);
+    box-shadow: 4px 17px 8px 0px rgba(197, 197, 197, 0.2);
+}
+
+.dots-pagination {
+    display: none;
+    justify-content: center;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #CCCCCC;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border: none;
+}
+
+.dot.active {
+    background-color: #1C1C1C;
+}
+
+/* Адаптивные стили для маленьких экранов */
+@media screen and (max-width: 640px) {
+    .carusel-item {
+        max-width: 350px;
+        box-sizing: border-box;
+    }
+    .dots-pagination {
+        display: flex;
+    }
+}
