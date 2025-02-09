@@ -3,8 +3,8 @@ import Link from "next/link";
 interface Params {
     index: string;
 }
-const DynamicPage = async ({ params }: { params: Params }) => {
-    const { index } = await params;
+const DynamicPage = ({ params }: { params: Params }) => {
+    const { index } = params;
 
     return (
         <div>
