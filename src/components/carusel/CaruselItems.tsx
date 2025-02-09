@@ -4,99 +4,104 @@ import items from '@/const/items';
 import CaruselItem from './CaruselItem';
 import DotsPagination from './DotsPagination';
 
+// Вынесем константу для лучшей поддерживаемости
+const ITEM_WIDTH = 365;
+
 const CaruselItems: React.FC = () => {
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
   const [activePagination, setActivePagination] = useState(0);
+  const animationFrameId = useRef<number | undefined>(undefined);
+
+  const syncPaginationWithScroll = useCallback(() => {
+    if (sliderRef.current) {
+      animationFrameId.current = requestAnimationFrame(() => {
+        const scrollPosition = sliderRef.current!.scrollLeft;
+        const activeIndex = Math.round(scrollPosition / ITEM_WIDTH);
+        setActivePagination(activeIndex);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const sliderElement = sliderRef.current;
+    if (!sliderElement) return;
 
-    if (sliderElement) {
-      const handleScroll = () => syncPaginationWithScroll();
-
-      sliderElement.addEventListener('scroll', handleScroll);
-      return () => {
-        sliderElement.removeEventListener('scroll', handleScroll);
-      };
-    }
+    const handleScroll = () => syncPaginationWithScroll();
+    
+    sliderElement.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      sliderElement.removeEventListener('scroll', handleScroll);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
   }, [syncPaginationWithScroll]);
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const getSliderElement = () => sliderRef.current;
+
+  const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     isDragging.current = true;
-    if (sliderRef.current) {
-      startX.current = event.pageX - sliderRef.current.offsetLeft;
-      scrollLeft.current = sliderRef.current.scrollLeft;
-      sliderRef.current.style.cursor = 'grabbing';
+    const slider = getSliderElement();
+    if (slider) {
+      startX.current = event.pageX - slider.offsetLeft;
+      scrollLeft.current = slider.scrollLeft;
+      slider.style.cursor = 'grabbing';
     }
-  };
+  }, []);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     isDragging.current = false;
-    if (sliderRef.current) {
-      sliderRef.current.style.cursor = 'grab';
-    }
-  };
+    const slider = getSliderElement();
+    if (slider) slider.style.cursor = 'grab';
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     isDragging.current = false;
-    if (sliderRef.current) {
-      sliderRef.current.style.cursor = 'grab';
-    }
-  };
+    const slider = getSliderElement();
+    if (slider) slider.style.cursor = 'grab';
+  }, []);
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging.current || !sliderRef.current) return;
+  const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    const slider = getSliderElement();
+    if (!slider) return;
+
     event.preventDefault();
-    const x = event.pageX - sliderRef.current.offsetLeft;
+    const x = event.pageX - slider.offsetLeft;
     const walk = (x - startX.current) * 1;
-    sliderRef.current.scrollLeft = scrollLeft.current - walk;
-  };
+    slider.scrollLeft = scrollLeft.current - walk;
+  }, []);
 
-  const handleWheel: React.WheelEventHandler<HTMLDivElement> = (event) => {
-    if (sliderRef.current) {
+  const handleWheel = useCallback<React.WheelEventHandler<HTMLDivElement>>((event) => {
+    const slider = getSliderElement();
+    if (slider) {
       event.stopPropagation();
-      sliderRef.current.scrollLeft += event.deltaY;
+      slider.scrollLeft += event.deltaY;
     }
-  };
+  }, []);
 
-  function syncPaginationWithScroll() {
-    if (sliderRef.current) {
-      const scrollPosition = sliderRef.current.scrollLeft;
-      const activeIndex = Math.round(scrollPosition / 365); 
-      setActivePagination(activeIndex);
-    }
-  }
-  
-  const handlePaginationClick = (index: number) => {
-    setActivePagination(index);
-    if (sliderRef.current) {
-      sliderRef.current.scrollTo({
-        left: index * 365,
+  const handlePaginationClick = useCallback((index: number) => {
+    const slider = getSliderElement();
+    if (slider) {
+      setActivePagination(index);
+      slider.scrollTo({
+        left: index * ITEM_WIDTH,
         behavior: 'smooth',
       });
     }
-  };
-
-  useEffect(() => {
-    const sliderElement = sliderRef.current;
-
-    if (sliderElement) {
-      const handleScroll = () => syncPaginationWithScroll();
-
-      sliderElement.addEventListener('scroll', handleScroll);
-      return () => {
-        sliderElement.removeEventListener('scroll', handleScroll);
-      };
-    }
-  }, [syncPaginationWithScroll]);
+  }, []);
 
   return (
     <div className="slider-container">
-      <DotsPagination activePagination={activePagination} onClick={handlePaginationClick} />
+      <DotsPagination 
+        activePagination={activePagination} 
+        onClick={handlePaginationClick} 
+      />
       <div
         ref={sliderRef}
         className="carusel-block"
